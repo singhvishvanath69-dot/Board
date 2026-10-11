@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>एडमिन — प्रश्न-उत्तर</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF0F7;--card:#fff;--ink:#1A2745;--muted:#5B6885;--line:#C9D6EA;--accent:#E8590C;--soft:#FFE8D9;--ok:#1F7A4D;--bad:#B42318}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Noto Sans Devanagari',system-ui,sans-serif;line-height:1.7;padding:16px 14px 60px}
+.wrap{max-width:720px;margin:0 auto}
+h1{font-family:'Tiro Devanagari Hindi',serif;font-weight:400;font-size:28px;line-height:1.3;margin:8px 0 14px}
+h2{font-size:17px;margin:0 0 10px}
+.panel{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:10px;padding:16px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+label{display:block;font-size:14px;font-weight:500;margin-bottom:4px}
+select,input,textarea{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+select:focus,input:focus,textarea:focus,button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+button{font:inherit;cursor:pointer}
+.btn{margin-top:14px;width:100%;font-weight:700;font-size:17px;padding:12px;border:0;border-radius:8px;background:var(--accent);color:#fff}
+.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.6}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.msg{margin:8px 0 0;font-size:14px;color:var(--muted)}
+.msg.err{color:var(--bad)}.msg.ok{color:var(--ok)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:14px;padding:4px}
+.ctx{background:var(--soft);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:14px}
+.item{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:#fff;overflow:hidden}
+.item .q{padding:10px 12px;background:#F3F7FD;font-weight:700;white-space:pre-wrap;display:flex;gap:8px;justify-content:space-between}
+.item .a{padding:10px 12px;white-space:pre-wrap}
+.item .act{display:flex;gap:8px;padding:0 12px 10px}
+.item .act button{padding:4px 12px;border:1px solid var(--line);background:#fff;border-radius:6px;color:var(--ink)}
+.item .act .del{color:var(--bad)}
+.mk{flex:none;background:var(--soft);color:var(--accent);border-radius:20px;padding:0 10px;font-size:13px;line-height:26px;align-self:flex-start;white-space:nowrap}
+.hidden{display:none}
+@media (max-width:480px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- लॉगिन -->
+<div id="loginView">
+  <h1>एडमिन लॉगिन</h1>
+  <div class="panel">
+    <label for="em">ईमेल</label><input id="em" type="email" autocomplete="username">
+    <label for="pw" style="margin-top:12px">पासवर्ड</label><input id="pw" type="password" autocomplete="current-password">
+    <button class="btn" id="loginBtn">लॉगिन करें</button>
+    <p class="msg" id="loginMsg"></p>
+  </div>
+</div>
+
+<!-- मुख्य -->
+<div id="mainView" class="hidden">
+  <div class="top"><h1>प्रश्न-उत्तर जोड़ें</h1><button class="link" id="logout">लॉगआउट</button></div>
+
+  <!-- चरण 1: किताब और चैप्टर -->
+  <div class="panel" id="step1">
+    <h2>पहले किताब और चैप्टर चुनें</h2>
+    <div class="grid">
+      <div><label for="board">बोर्ड</label>
+        <select id="board"><option>CBSE</option><option>UP Board</option><option>MP Board</option>
+          <option>Bihar Board</option><option>Rajasthan Board</option><option>ICSE</option><option>अन्य</option></select></div>
+      <div><label for="medium">मीडियम</label>
+        <select id="medium"><option>हिंदी</option><option>English</option></select></div>
+      <div class="full"><label for="cls">क्लास</label><select id="cls"></select></div>
+      <div class="full"><label for="book">किताब का नाम</label><input id="book"></div>
+      <div class="full"><label for="chapter">चैप्टर का नाम</label><input id="chapter"></div>
+    </div>
+    <button class="btn" id="openBtn">आगे बढ़ें</button>
+    <p class="msg err" id="openMsg"></p>
+  </div>
+
+  <!-- चरण 2: प्रश्न, उत्तर, नंबर -->
+  <div id="step2" class="hidden">
+    <div class="panel">
+      <div class="ctx" id="ctx"></div>
+      <h2 id="formTitle">अब प्रश्न, उत्तर और नंबर भरें</h2>
+      <label for="q">प्रश्न</label><textarea id="q"></textarea>
+      <label for="a" style="margin-top:12px">उत्तर</label><textarea id="a"></textarea>
+      <label for="m" style="margin-top:12px">नंबर (अंक)</label><input id="m" type="number" inputmode="decimal" min="0" step="0.5">
+      <div class="row"><button class="btn" id="saveBtn">प्रश्न सेव करें</button><button class="btn alt hidden" id="cancelEdit">बदलाव रद्द करें</button></div>
+      <p class="msg" id="saveMsg"></p>
+      <button class="btn alt" id="changeBtn">दूसरा चैप्टर चुनें</button>
+    </div>
+    <h2 id="listTitle"></h2>
+    <div id="list"></div>
+  </div>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, push, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyBmLqvofpxrEoIBmBoHlssG6Alau1N3ruw",
+  authDomain: "psb-studio.firebaseapp.com",
+  databaseURL: "https://psb-studio-default-rtdb.firebaseio.com",
+  projectId: "psb-studio",
+  storageBucket: "psb-studio.firebasestorage.app",
+  messagingSenderId: "703528049927",
+  appId: "1:703528049927:web:cd7968fdc66eb9b427f9a2",
+  measurementId: "G-TW8ST3RVF3"
+});
+const db = getDatabase(app), auth = getAuth(app);
+
+const norm = s => String(s).trim().toLowerCase().replace(/[.#$\[\]\/]/g,'').replace(/\s+/g,'_');
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const say = (id, t, k='') => { $(id).textContent = t; $(id).className = 'msg ' + k; };
+
+for (let i = 1; i <= 12; i++) $('cls').insertAdjacentHTML('beforeend', `<option value="${i}">कक्षा ${i}</option>`);
+
+/* ---------- लॉगिन ---------- */
+$('loginBtn').onclick = async () => {
+  say('loginMsg', 'लॉगिन हो रहा है…');
+  try { await signInWithEmailAndPassword(auth, $('em').value.trim(), $('pw').value); say('loginMsg',''); }
+  catch (e) { say('loginMsg', 'ईमेल या पासवर्ड सही नहीं है।', 'err'); }
+};
+$('logout').onclick = () => signOut(auth);
+onAuthStateChanged(auth, u => {
+  $('loginView').classList.toggle('hidden', !!u);
+  $('mainView').classList.toggle('hidden', !u);
+  if (!u) backToStep1();
+});
+
+/* ---------- चरण 1 ---------- */
+let cur = null, unsub = null, items = {}, editId = null;
+
+$('openBtn').onclick = () => {
+  const book = $('book').value.trim(), chapter = $('chapter').value.trim();
+  if (!book || !chapter) { say('openMsg', 'किताब और चैप्टर का नाम भरें।', 'err'); return; }
+  say('openMsg', '');
+  cur = {
+    path: `qa/${norm($('board').value)}/${norm($('medium').value)}/${$('cls').value}/${norm(book)}/${norm(chapter)}`,
+    board: $('board').value, medium: $('medium').value, cls: $('cls').value, bookName: book, chapterName: chapter
+  };
+  $('ctx').textContent = `${cur.board} · ${cur.medium} · कक्षा ${cur.cls} · ${book} · ${chapter}`;
+  $('step1').classList.add('hidden'); $('step2').classList.remove('hidden');
+  clearForm();
+  if (unsub) unsub();
+  unsub = onValue(ref(db, cur.path + '/items'), s => { items = s.val() || {}; render(); },
+    () => say('saveMsg', 'डेटा पढ़ने की अनुमति नहीं मिली। Database rules जाँचें।', 'err'));
+};
+
+function backToStep1(){
+  if (unsub) { unsub(); unsub = null; }
+  cur = null; items = {};
+  $('step2').classList.add('hidden'); $('step1').classList.remove('hidden');
+}
+$('changeBtn').onclick = backToStep1;
+
+/* ---------- चरण 2 ---------- */
+function clearForm(){
+  $('q').value = ''; $('a').value = ''; $('m').value = ''; editId = null;
+  $('formTitle').textContent = 'अब प्रश्न, उत्तर और नंबर भरें';
+  $('saveBtn').textContent = 'प्रश्न सेव करें';
+  $('cancelEdit').classList.add('hidden'); say('saveMsg','');
+}
+$('cancelEdit').onclick = clearForm;
+
+$('saveBtn').onclick = async () => {
+  const q = $('q').value.trim(), a = $('a').value.trim(), m = $('m').value.trim();
+  if (!q) return say('saveMsg', 'प्रश्न भरें।', 'err');
+  if (!a) return say('saveMsg', 'उत्तर भरें।', 'err');
+  if (m === '') return say('saveMsg', 'नंबर भरें।', 'err');
+  const btn = $('saveBtn'); btn.disabled = true; say('saveMsg', 'सेव हो रहा है…');
+  try {
+    const id = editId || push(ref(db, cur.path + '/items')).key;
+    const old = items[id];
+    const up = {
+      [`${cur.path}/bookName`]: cur.bookName, [`${cur.path}/chapterName`]: cur.chapterName,
+      [`${cur.path}/board`]: cur.board, [`${cur.path}/medium`]: cur.medium, [`${cur.path}/cls`]: cur.cls,
+      [`${cur.path}/items/${id}`]: { q, a, m: Number(m), t: old ? old.t : Date.now() }
+    };
+    await update(ref(db), up);
+    const wasEdit = !!editId;
+    clearForm(); say('saveMsg', wasEdit ? 'बदलाव सेव हो गया।' : 'प्रश्न सेव हो गया। अगला प्रश्न भरें।', 'ok');
+  } catch (e) {
+    console.error(e);
+    say('saveMsg', 'सेव नहीं हुआ। लॉगिन और Database rules जाँचें।', 'err');
+  } finally { btn.disabled = false; }
+};
+
+function render(){
+  const ids = Object.keys(items).sort((x,y) => (items[x].t||0)-(items[y].t||0));
+  const total = ids.reduce((s,k) => s + (Number(items[k].m)||0), 0);
+  $('listTitle').textContent = ids.length ? `जोड़े गए प्रश्न: ${ids.length} · कुल अंक: ${total}` : 'इस चैप्टर में अभी कोई प्रश्न नहीं है।';
+  $('list').innerHTML = ids.map((k,i) => `<div class="item">
+    <div class="q"><span>${i+1}. ${esc(items[k].q)}</span><span class="mk">${esc(items[k].m)} अंक</span></div>
+    <div class="a">${esc(items[k].a)}</div>
+    <div class="act"><button data-e="${k}">बदलें</button><button class="del" data-d="${k}">हटाएँ</button></div></div>`).join('');
+}
+$('list').onclick = async e => {
+  const k = e.target.dataset.e, d = e.target.dataset.d;
+  if (k) {
+    const x = items[k]; editId = k;
+    $('q').value = x.q; $('a').value = x.a; $('m').value = x.m;
+    $('formTitle').textContent = 'प्रश्न में बदलाव करें';
+    $('saveBtn').textContent = 'बदलाव सेव करें';
+    $('cancelEdit').classList.remove('hidden');
+    $('q').scrollIntoView({behavior:'smooth', block:'center'});
+  } else if (d && confirm('यह प्रश्न हटाना है?')) {
+    try { await remove(ref(db, `${cur.path}/items/${d}`)); if (editId === d) clearForm(); }
+    catch { say('saveMsg', 'हटाया नहीं जा सका।', 'err'); }
+  }
+};
+</script>
+</body>
+</html>
